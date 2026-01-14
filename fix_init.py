@@ -11,7 +11,7 @@ files = [
 ]
 
 for filepath in files:
-    full_path = os.path.join(r'c:\Users\Harshit\OneDrive\Desktop\kanu\projects\TaskFlow', filepath)
+    full_path = os.path.join(r'..\projects\TaskFlow', filepath)
     
     with open(full_path, 'r', encoding='utf-8') as f:
         content = f.read()
