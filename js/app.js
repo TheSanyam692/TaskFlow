@@ -4,17 +4,24 @@
 
 const App = {
     currentView: 'tasks',
+    initialized: false,
 
     /**
      * Initialize application
      */
     init() {
+        if (this.initialized) {
+            console.warn('App already initialized');
+            return;
+        }
+
         console.log('🚀 TaskFlow initializing...');
 
         this.setupNavigation();
         this.initializeModules();
         this.showWelcomeMessage();
 
+        this.initialized = true;
         console.log('✅ TaskFlow ready!');
     },
 
@@ -50,9 +57,9 @@ const App = {
         this.currentView = viewName;
 
         // Refresh the active view
-        if (viewName === 'tasks') {
+        if (viewName === 'tasks' && typeof TaskUI !== 'undefined') {
             TaskUI.render();
-        } else if (viewName === 'calendar') {
+        } else if (viewName === 'calendar' && typeof CalendarUI !== 'undefined') {
             CalendarUI.render();
         }
     },
@@ -95,10 +102,12 @@ const App = {
 
         if (!hasSeenWelcome) {
             setTimeout(() => {
-                Notifications.info(
-                    'Welcome to TaskFlow! 🎉',
-                    'Your collaborative task manager and event scheduler'
-                );
+                if (typeof Notifications !== 'undefined') {
+                    Notifications.info(
+                        'Welcome to TaskFlow! 🎉',
+                        'Your collaborative task manager and event scheduler'
+                    );
+                }
                 localStorage.setItem('taskflow_welcome_seen', 'true');
             }, 500);
         }
@@ -207,12 +216,18 @@ window.TaskFlow = App;
 
 // Add keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+    // Don't trigger shortcuts when typing in inputs (except Escape)
+    const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+    if (isTyping && e.key !== 'Escape') {
+        return;
+    }
+
     // Cmd/Ctrl + K: Quick add task
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        if (App.currentView === 'tasks') {
+        if (App.currentView === 'tasks' && typeof TaskUI !== 'undefined') {
             TaskUI.openTaskModal();
-        } else {
+        } else if (typeof CalendarUI !== 'undefined') {
             CalendarUI.openEventModal();
         }
     }
@@ -234,11 +249,13 @@ document.addEventListener('keydown', (e) => {
         const taskModal = document.getElementById('task-modal');
         const eventModal = document.getElementById('event-modal');
 
-        if (taskModal && !taskModal.classList.contains('hidden')) {
+        if (taskModal && !taskModal.classList.contains('hidden') && typeof TaskUI !== 'undefined') {
+            e.preventDefault();
             TaskUI.closeTaskModal();
         }
 
-        if (eventModal && !eventModal.classList.contains('hidden')) {
+        if (eventModal && !eventModal.classList.contains('hidden') && typeof CalendarUI !== 'undefined') {
+            e.preventDefault();
             CalendarUI.closeEventModal();
         }
     }

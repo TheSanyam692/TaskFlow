@@ -295,13 +295,6 @@ const TaskManager = {
     }
 };
 
-// Auto-initialize
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => TaskManager.init());
-} else {
-    TaskManager.init();
-}
-
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = TaskManager;

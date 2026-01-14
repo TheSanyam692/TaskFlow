@@ -324,13 +324,6 @@ const TaskUI = {
     }
 };
 
-// Auto-initialize
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => TaskUI.init());
-} else {
-    TaskUI.init();
-}
-
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = TaskUI;

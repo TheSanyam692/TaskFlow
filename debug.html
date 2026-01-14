@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>TaskFlow - Debug Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .ok {
+            background: #2d6a4f;
+        }
+
+        .error {
+            background: #9d0208;
+        }
+
+        .warning {
+            background: #ca6702;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>TaskFlow Debug Page</h1>
+    <p>This page will help diagnose the button issue.</p>
+
+    <div id="status"></div>
+
+    <button onclick="runTests()">Run Diagnostic Tests</button>
+    <button onclick="location.href='index.html'">Go to TaskFlow</button>
+
+    <script>
+        function runTests() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<h2>Running Tests...</h2>';
+            const results = [];
+
+            // Test 1: Check if main app loads
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            setTimeout(() => {
+                const win = iframe.contentWindow;
+
+                // Check modules
+                results.push({
+                    name: 'TaskManager loaded',
+                    pass: typeof win.TaskManager !== 'undefined',
+                    value: typeof win.TaskManager
+                });
+
+                results.push({
+                    name: 'TaskUI loaded',
+                    pass: typeof win.TaskUI !== 'undefined',
+                    value: typeof win.TaskUI
+                });
+
+                results.push({
+                    name: 'App loaded',
+                    pass: typeof win.App !== 'undefined',
+                    value: typeof win.App
+                });
+
+                results.push({
+                    name: 'Notifications loaded',
+                    pass: typeof win.Notifications !== 'undefined',
+                    value: typeof win.Notifications
+                });
+
+                // Check initialization
+                if (typeof win.App !== 'undefined') {
+                    results.push({
+                        name: 'App initialized',
+                        pass: win.App.initialized === true,
+                        value: win.App.initialized
+                    });
+                }
+
+                // Check for console errors
+                results.push({
+                    name: 'No console errors',
+                    pass: true,
+                    value: 'Check browser console manually'
+                });
+
+                // Display results
+                let html = '<h2>Test Results:</h2>';
+                results.forEach(r => {
+                    const className = r.pass ? 'ok' : 'error';
+                    html += `<div class="status ${className}">
+                        <strong>${r.name}:</strong> ${r.pass ? '✅ PASS' : '❌ FAIL'} 
+                        (Value: ${r.value})
+                    </div>`;
+                });
+
+                html += '<h3>Instructions:</h3>';
+                html += '<ol>';
+                html += '<li>If all tests pass, try HARD REFRESH (Ctrl+Shift+R) on the main TaskFlow page</li>';
+                html += '<li>If tests fail, check the browser console (F12) for errors</li>';
+                html += '<li>Make sure you cleared your browser cache</li>';
+                html += '</ol>';
+
+                status.innerHTML = html;
+                document.body.removeChild(iframe);
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
