@@ -1,11 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow</title>
+    <meta name="description"
+        content="TaskFlow - A collaborative task manager and event scheduler with beautiful UI and powerful features">
+    <title>TaskFlow - Collaborative Task Manager & Event Scheduler</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <h1>TaskFlow</h1>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="logo">⚡ TaskFlow</h1>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" id="nav-tasks" data-view="tasks">Tasks</button>
+                <button class="nav-tab" id="nav-calendar" data-view="calendar">Calendar</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content container">
+
+        <!-- Tasks View -->
+        <div id="tasks-view" class="view active">
+            <div class="section-header">
+                <h2 class="section-title">Task Management</h2>
+                <p class="section-subtitle">Organize your work with collaborative task tracking</p>
+            </div>
+
+            <!-- Task Controls -->
+            <div class="controls-bar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="task-search" class="search-input" placeholder="Search tasks...">
+                </div>
+                <div class="filters">
+                    <select id="filter-status" class="form-select">
+                        <option value="all">All Status</option>
+                        <option value="todo">To-Do</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <select id="filter-priority" class="form-select">
+                        <option value="all">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select id="sort-tasks" class="form-select">
+                        <option value="created">Created Date</option>
+                        <option value="deadline">Deadline</option>
+                        <option value="priority">Priority</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="btn-add-task">
+                    <span>➕</span>
+                    Add Task
+                </button>
+            </div>
+
+            <!-- Task Grid -->
+            <div id="task-grid" class="task-grid">
+                <!-- Tasks will be rendered here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="tasks-empty" class="empty-state hidden">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-text">No tasks found</div>
+                <p style="color: var(--text-tertiary); margin-bottom: var(--space-lg);">
+                    Create your first task to get started
+                </p>
+                <button class="btn btn-primary" id="btn-add-task-empty">
+                    <span>➕</span>
+                    Add Your First Task
+                </button>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div id="calendar-view" class="view">
+            <div class="section-header">
+                <h2 class="section-title">Event Scheduler</h2>
+                <p class="section-subtitle">Plan and manage your events with an interactive calendar</p>
+            </div>
+
+            <!-- Calendar Header -->
+            <div class="calendar-header">
+                <h3 class="calendar-title" id="calendar-month-year">January 2026</h3>
+                <div class="calendar-nav">
+                    <button class="btn-icon" id="btn-prev-month" title="Previous Month">
+                        <span>◀</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="btn-today">Today</button>
+                    <button class="btn-icon" id="btn-next-month" title="Next Month">
+                        <span>▶</span>
+                    </button>
+                    <button class="btn btn-primary" id="btn-add-event">
+                        <span>➕</span>
+                        Add Event
+                    </button>
+                </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid">
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">Sun</div>
+                    <div class="calendar-weekday">Mon</div>
+                    <div class="calendar-weekday">Tue</div>
+                    <div class="calendar-weekday">Wed</div>
+                    <div class="calendar-weekday">Thu</div>
+                    <div class="calendar-weekday">Fri</div>
+                    <div class="calendar-weekday">Sat</div>
+                </div>
+                <div class="calendar-days" id="calendar-days">
+                    <!-- Calendar days will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Events List -->
+            <div class="events-list">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: var(--space-lg);">
+                    Upcoming Events
+                </h3>
+                <div id="events-list">
+                    <!-- Events will be rendered here -->
+                </div>
+                <div id="events-empty" class="empty-state hidden">
+                    <div class="empty-state-icon">📅</div>
+                    <div class="empty-state-text">No events scheduled</div>
+                    <p style="color: var(--text-tertiary); margin-bottom: var(--space-lg);">
+                        Add your first event to the calendar
+                    </p>
+                    <button class="btn btn-primary" id="btn-add-event-empty">
+                        <span>➕</span>
+                        Add Your First Event
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="task-modal-title">Add New Task</h3>
+                <button class="modal-close" id="close-task-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <div class="form-group">
+                        <label class="form-label" for="task-title">Task Title *</label>
+                        <input type="text" id="task-title" class="form-input" placeholder="Enter task title" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="task-description">Description</label>
+                        <textarea id="task-description" class="form-textarea"
+                            placeholder="Enter task description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="task-assignee">Assignee</label>
+                        <input type="text" id="task-assignee" class="form-input" placeholder="Enter assignee name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="task-status">Status</label>
+                        <select id="task-status" class="form-select">
+                            <option value="todo">To-Do</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="task-priority">Priority</label>
+                        <select id="task-priority" class="form-select">
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="task-deadline">Deadline</label>
+                        <input type="date" id="task-deadline" class="form-input">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-task">Cancel</button>
+                <button class="btn btn-primary" id="save-task">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="event-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="event-modal-title">Add New Event</h3>
+                <button class="modal-close" id="close-event-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="event-form">
+                    <div class="form-group">
+                        <label class="form-label" for="event-title">Event Title *</label>
+                        <input type="text" id="event-title" class="form-input" placeholder="Enter event title" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="event-description">Description</label>
+                        <textarea id="event-description" class="form-textarea"
+                            placeholder="Enter event description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="event-date">Date *</label>
+                        <input type="date" id="event-date" class="form-input" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                        <div class="form-group">
+                            <label class="form-label" for="event-start-time">Start Time</label>
+                            <input type="time" id="event-start-time" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="event-end-time">End Time</label>
+                            <input type="time" id="event-end-time" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="event-location">Location</label>
+                        <input type="text" id="event-location" class="form-input" placeholder="Enter event location">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="event-color">Color</label>
+                        <select id="event-color" class="form-select">
+                            <option value="hsl(260, 70%, 55%)">Purple</option>
+                            <option value="hsl(200, 70%, 55%)">Blue</option>
+                            <option value="hsl(150, 60%, 55%)">Green</option>
+                            <option value="hsl(35, 85%, 60%)">Orange</option>
+                            <option value="hsl(0, 75%, 60%)">Red</option>
+                            <option value="hsl(290, 70%, 60%)">Pink</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="event-reminder">Reminder</label>
+                        <select id="event-reminder" class="form-select">
+                            <option value="none">No Reminder</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="60">1 hour before</option>
+                            <option value="1440">1 day before</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-event">Cancel</button>
+                <button class="btn btn-primary" id="save-event">Save Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/taskManager.js"></script>
+    <script src="js/taskUI.js"></script>
+    <script src="js/eventScheduler.js"></script>
+    <script src="js/calendarUI.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
