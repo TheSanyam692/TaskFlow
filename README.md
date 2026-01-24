@@ -15,7 +15,7 @@
 
 ```
 taskflow/
-├── frontend/        # Frontend code (HTML, CSS, JS)
+├── docs/        # Frontend code (HTML, CSS, JS)
 │   ├── index.html   # Main application entry point
 │   ├── css/         # Stylesheets
 │   └── js/          # JavaScript logic
